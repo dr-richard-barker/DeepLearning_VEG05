@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+@page {
+    size: letter;
+    margin: 1in 1in 1in 1in;
+}
+body {
+    font-family: "DejaVu Sans", Arial, Helvetica, sans-serif;
+    font-size: 10pt;
+    line-height: 1.5;
+    color: #000;
+}
+h1 {
+    font-size: 16pt;
+    font-weight: bold;
+    margin-top: 0;
+    margin-bottom: 12pt;
+    border-bottom: 2px solid #000;
+    padding-bottom: 6pt;
+}
+h2 {
+    font-size: 13pt;
+    font-weight: bold;
+    margin-top: 18pt;
+    margin-bottom: 8pt;
+}
+h3 {
+    font-size: 11pt;
+    font-weight: bold;
+    margin-top: 14pt;
+    margin-bottom: 6pt;
+}
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 10pt 0;
+    font-size: 9pt;
+}
+th, td {
+    border: 1px solid #333;
+    padding: 4pt 6pt;
+    text-align: left;
+}
+th {
+    background-color: #f0f0f0;
+    font-weight: bold;
+}
+code {
+    font-family: "DejaVu Sans Mono", "Courier New", monospace;
+    font-size: 8.5pt;
+    background-color: #f5f5f5;
+    padding: 1pt 3pt;
+}
+pre {
+    background-color: #f5f5f5;
+    border: 1px solid #ddd;
+    padding: 10pt;
+    overflow-x: auto;
+    font-size: 8pt;
+    line-height: 1.4;
+}
+pre code {
+    background-color: transparent;
+    padding: 0;
+}
+strong {
+    font-weight: bold;
+}
+p {
+    margin: 6pt 0;
+}
+ol {
+    margin: 6pt 0;
+    padding-left: 20pt;
+}
+li {
+    margin: 3pt 0;
+}
+</style>
+</head>
+<body>
+<h1>Supplementary Methods</h1>
+<h2>S1. Differential Expression Analysis</h2>
+<h3>Interaction model specification</h3>
+<p>Differential expression was performed using DESeq2 (v1.38.3) [1] with a full factorial interaction model that decomposes transcriptomic variation into light effects, condition (spaceflight) effects, and their interaction:</p>
+<p><strong>Design formula:</strong> <code>~ light + condition + light:condition</code></p>
+<p><strong>Factor levels and reference categories:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Factor</th>
+<th>Levels</th>
+<th>Reference</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Light</td>
+<td>Red, Blue</td>
+<td>Red</td>
+</tr>
+<tr>
+<td>Condition</td>
+<td>Ground, Flight</td>
+<td>Ground</td>
+</tr>
+</tbody>
+</table>
+<p>The interaction term <code>light:condition</code> captures genes where the spaceflight effect differs between red and blue light conditions. The coefficient <code>lightBlue.conditionFlight</code> represents the difference in spaceflight response between blue and red light.</p>
+<p><strong>Pre-filtering:</strong> Genes with fewer than 10 total counts across all samples were removed prior to analysis. After filtering, 20,157 genes remained in the leaf dataset and 21,158 in the root dataset.</p>
+<p><strong>Dispersion estimation:</strong> DESeq2's default parametric fit was used for gene-wise dispersion estimates, with shrinkage toward the fitted trend line to improve stability for low-count genes.</p>
+<p><strong>Statistical test:</strong> Wald test with Benjamini-Hochberg false discovery rate (FDR) correction for multiple testing. DESeq2's independent filtering (based on baseMean) was applied to maximize detection power.</p>
+<p><strong>Log-fold-change shrinkage:</strong> Adaptive shrinkage (ashr, v2.2-63) [2] was applied to all LFC estimates to reduce the impact of high-variance LFC estimates from low-count genes. The shrunk LFC values were used for all downstream analyses and visualizations.</p>
+<p><strong>Significance thresholds:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Effect type</th>
+<th>Adjusted p-value</th>
+<th>Absolute shrunk LFC</th>
+<th>Rationale</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Main effects (Light, Condition)</td>
+<td>&lt; 0.05</td>
+<td>≥ 1.0</td>
+<td>Standard genome-wide threshold</td>
+</tr>
+<tr>
+<td>Interaction</td>
+<td>&lt; 0.1</td>
+<td>≥ 0.5</td>
+<td>Relaxed per factorial design convention; interaction effects are inherently smaller and biologically meaningful even at modest effect sizes</td>
+</tr>
+</tbody>
+</table>
+<p>The relaxed interaction threshold follows the convention for factorial designs, where interaction effects are typically smaller than main effects and detecting them requires a less stringent cutoff to avoid excessive Type II error [3]. At the strict threshold (padj &lt; 0.05, |LFC| ≥ 1), 2,894 leaf interaction genes remain significant.</p>
+<p><strong>Expressed gene universe:</strong> 21,786 genes passed the count filter in at least one tissue and were used as the background for all enrichment analyses.</p>
+<h3>Complete R code</h3>
+<pre><code class="language-r">library(DESeq2)
+library(ashr)
+
+# Load count matrix and sample metadata
+# counts: gene × sample matrix of raw counts
+# coldata: sample × factor data frame with columns: light, condition
+
+# Create DESeqDataSet with interaction design
+dds &lt;- DESeqDataSetFromMatrix(countData = counts,
+                               colData = coldata,
+                               design = ~ light + condition + light:condition)
+
+# Set reference levels
+dds$light &lt;- relevel(dds$light, ref = &quot;Red&quot;)
+dds$condition &lt;- relevel(dds$condition, ref = &quot;Ground&quot;)
+
+# Pre-filter low-count genes
+keep &lt;- rowSums(counts(dds)) &gt;= 10
+dds &lt;- dds[keep,]
+
+# Run DESeq2 pipeline
+dds &lt;- DESeq(dds)
+
+# Extract results for each effect
+# Main effect: Light (Blue vs Red)
+res_light &lt;- results(dds, name = &quot;light_Blue_vs_Red&quot;)
+
+# Main effect: Condition (Flight vs Ground)
+res_condition &lt;- results(dds, name = &quot;condition_Flight_vs_Ground&quot;)
+
+# Interaction: Light × Condition
+res_interaction &lt;- results(dds, name = &quot;lightBlue.conditionFlight&quot;)
+
+# Apply LFC shrinkage with ashr
+res_light_shrunk &lt;- lfcShrink(dds, coef = &quot;light_Blue_vs_Red&quot;, type = &quot;ashr&quot;)
+res_condition_shrunk &lt;- lfcShrink(dds, coef = &quot;condition_Flight_vs_Ground&quot;, type = &quot;ashr&quot;)
+res_interaction_shrunk &lt;- lfcShrink(dds, coef = &quot;lightBlue.conditionFlight&quot;, type = &quot;ashr&quot;)
+
+# Classify significant genes
+# Main effects: padj &lt; 0.05, |shrunk LFC| &gt;= 1
+# Interaction: padj &lt; 0.1, |shrunk LFC| &gt;= 0.5
+sig_light &lt;- which(res_light_shrunk$padj &lt; 0.05 &amp;
+                   abs(res_light_shrunk$log2FoldChange) &gt;= 1)
+sig_interaction &lt;- which(res_interaction_shrunk$padj &lt; 0.1 &amp;
+                         abs(res_interaction_shrunk$log2FoldChange) &gt;= 0.5)
+</code></pre>
+<h3>Sample sizes</h3>
+<table>
+<thead>
+<tr>
+<th>Tissue</th>
+<th>Ground Red</th>
+<th>Ground Blue</th>
+<th>Flight Red</th>
+<th>Flight Blue</th>
+<th>Total</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Leaf</td>
+<td>6</td>
+<td>6</td>
+<td>5</td>
+<td>4</td>
+<td>21</td>
+</tr>
+<tr>
+<td>Root</td>
+<td>3</td>
+<td>3</td>
+<td>5</td>
+<td>4</td>
+<td>15</td>
+</tr>
+<tr>
+<td>Combined</td>
+<td>9</td>
+<td>9</td>
+<td>10</td>
+<td>8</td>
+<td>36</td>
+</tr>
+</tbody>
+</table>
+<p>Note: The combined analysis pools leaf and root samples with tissue as an implicit blocking factor.</p>
+<h2>S2. Functional Enrichment Analysis</h2>
+<h3>Gene Ontology and KEGG enrichment</h3>
+<p>Functional enrichment was performed using clusterProfiler (v4.10.0) [4] with the following parameters:</p>
+<p><strong>enrichGO (Gene Ontology):</strong></p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ont</td>
+<td>"BP" (Biological Process)</td>
+</tr>
+<tr>
+<td>pvalueCutoff</td>
+<td>0.1</td>
+</tr>
+<tr>
+<td>qvalueCutoff</td>
+<td>0.2</td>
+</tr>
+<tr>
+<td>minGSSize</td>
+<td>5</td>
+</tr>
+<tr>
+<td>maxGSSize</td>
+<td>500</td>
+</tr>
+<tr>
+<td>pAdjustMethod</td>
+<td>"BH" (Benjamini-Hochberg)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>enrichKEGG (KEGG pathways):</strong></p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>organism</td>
+<td>"sly" (Solanum lycopersicum)</td>
+</tr>
+<tr>
+<td>keyType</td>
+<td>"kegg"</td>
+</tr>
+<tr>
+<td>pvalueCutoff</td>
+<td>0.1</td>
+</tr>
+<tr>
+<td>qvalueCutoff</td>
+<td>0.2</td>
+</tr>
+<tr>
+<td>minGSSize</td>
+<td>5</td>
+</tr>
+<tr>
+<td>maxGSSize</td>
+<td>500</td>
+</tr>
+<tr>
+<td>pAdjustMethod</td>
+<td>"BH"</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Background universe:</strong> All expressed genes with Entrez ID mappings (N = 16,046 of 21,786 expressed genes). Gene ID conversion from Solyc identifiers to Entrez IDs was performed using the mapping file derived from Ensembl Plants Release 109 / ITAG 4.0, yielding 16,046 unique Solyc-to-Entrez mappings. Mapping rates ranged from 59.7% to 75.0% across DEG sets.</p>
+<p><strong>DEG set stratification:</strong> Enrichment was computed separately for each tissue × effect × direction combination:
+- Leaf: light-up, light-down, condition-up, condition-down
+- Root: light-up, light-down, condition-up, condition-down</p>
+<p>Interaction DEGs were further stratified by positive (stronger spaceflight effect under blue light) and negative (stronger effect under red light) directions.</p>
+<h2>S3. Cell-Type Deconvolution</h2>
+<h3>Leaf cell-type mapping</h3>
+<p>Single-cell RNA-seq cluster annotations from Yue et al. [5] were used to map bulk DEGs to leaf cell types. The published UMAP clusters were annotated into six cell-type groups:</p>
+<table>
+<thead>
+<tr>
+<th>Cell type</th>
+<th>Clusters</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Mesophyll</td>
+<td>4, 5, 6, 7, 8</td>
+<td>Photosynthetic parenchyma</td>
+</tr>
+<tr>
+<td>Epidermis</td>
+<td>1, 2, 10, 11</td>
+<td>Surface cell layer</td>
+</tr>
+<tr>
+<td>Vascular</td>
+<td>3</td>
+<td>Conducting tissue</td>
+</tr>
+<tr>
+<td>Proliferating</td>
+<td>0</td>
+<td>Actively dividing cells</td>
+</tr>
+<tr>
+<td>Trichome</td>
+<td>9</td>
+<td>Glandular trichomes</td>
+</tr>
+<tr>
+<td>Uncharacterized</td>
+<td>12</td>
+<td>Unassigned cluster</td>
+</tr>
+</tbody>
+</table>
+<p>Marker genes for each cluster were obtained from the published supplementary data. Cell-type overlap was tested using Fisher's exact test (one-sided, greater) with the 21,786 expressed genes as the background universe.</p>
+<h3>Root cell-type mapping</h3>
+<p>TRAP-seq cell-type marker genes from Kajala et al. [6] were used for root deconvolution. Eleven root cell types were represented:</p>
+<table>
+<thead>
+<tr>
+<th>Cell type group</th>
+<th>Individual cell types</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Epidermis</td>
+<td>Epidermis</td>
+</tr>
+<tr>
+<td>Exodermis</td>
+<td>Exodermis</td>
+</tr>
+<tr>
+<td>Cortex</td>
+<td>Cortex, Cortex_ACT2, Meristematic_Cortex</td>
+</tr>
+<tr>
+<td>Endodermis</td>
+<td>Endodermis</td>
+</tr>
+<tr>
+<td>Vascular</td>
+<td>Phloem, Vascular, Vascular_WOX4</td>
+</tr>
+<tr>
+<td>Xylem</td>
+<td>Xylem</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Fisher's exact test parameters:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Alternative</td>
+<td>"greater" (one-sided)</td>
+</tr>
+<tr>
+<td>Background</td>
+<td>N = 21,786 expressed genes</td>
+</tr>
+<tr>
+<td>Multiple testing correction</td>
+<td>Benjamini-Hochberg across all cell-type × effect × direction tests</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Radial ordering:</strong> Cell types were ordered from outer to inner: Epidermis → Exodermis → Cortex → Cortex_ACT2 → Meristematic_Cortex → Endodermis → Phloem → Vascular → Vascular_WOX4 → Xylem. This ordering reflects the anatomical arrangement from the root periphery to the stele.</p>
+<h2>S4. Per-Cell-Type Pathway Enrichment</h2>
+<h3>Stratification scheme</h3>
+<p>To identify cell-type-specific pathway responses, DEG sets were stratified by cell type and regulation direction before KEGG enrichment analysis. For each tissue × effect × cell-type × direction combination, the overlapping genes between the DEG set and the cell-type marker gene set were tested for KEGG pathway enrichment.</p>
+<p><strong>DEG set naming convention:</strong> <code>tissue_effect_celltype_direction</code>
+- Example: <code>root_cond_Cortex_ACT2_up</code> = root condition-up genes that are also Cortex_ACT2 markers</p>
+<p><strong>KEGG enrichment parameters:</strong> Same as described in S2 (clusterProfiler enrichKEGG with pvalueCutoff = 0.1, qvalueCutoff = 0.2, minGSSize = 5, maxGSSize = 500).</p>
+<p><strong>Minimum overlap threshold:</strong> Cell-type × direction combinations with fewer than 5 overlapping genes were excluded from enrichment analysis.</p>
+<h3>Direction-stratified enrichment</h3>
+<p>For each cell type, enrichment was computed separately for upregulated and downregulated DEGs. This direction stratification enables detection of pathways that are specifically enriched in one regulatory direction within a cell type, which would be masked in a combined (up + down) analysis.</p>
+<h2>S5. PhysioSpace Stress-Pattern Mapping</h2>
+<h3>Ortholog mapping</h3>
+<p>Tomato (<em>Solanum lycopersicum</em>) genes were mapped to <em>Arabidopsis thaliana</em> orthologs using Ensembl Compara (Release 109) [7] via the biomaRt R package (v2.58.2). One-to-one orthologs were used exclusively to ensure unambiguous cross-species transfer of stress signatures. Of 21,786 expressed tomato genes, 14,847 (68.2%) had one-to-one <em>Arabidopsis</em> orthologs, providing the input gene universe for PhysioSpace projection.</p>
+<h3>Reference stress spaces</h3>
+<p>Three pre-computed <em>Arabidopsis</em> stress spaces from the Plant PhysioSpace repository [6] were used as reference frameworks:</p>
+<table>
+<thead>
+<tr>
+<th>Space</th>
+<th>Axes</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>AT_Stress_Space</td>
+<td>20</td>
+<td>Individual abiotic and biotic stress conditions (e.g., Drought, Heat, Biotic, Light, UV)</td>
+</tr>
+<tr>
+<td>AT_Stress_Meta</td>
+<td>15</td>
+<td>Meta-grouped stress categories combining related conditions (e.g., DrouSaTic = Drought + Salt + Osmotic; BioMone = Biotic + Hormone; LighUV = Light + UV)</td>
+</tr>
+<tr>
+<td>AT_RNAseq</td>
+<td>7</td>
+<td>Combined stress experiments from public RNA-seq datasets (e.g., Biotic.Drought, Drought.Biotic)</td>
+</tr>
+</tbody>
+<h3>PhysioScore computation</h3>
+<p>PhysioSpace projection was performed using the R package PhysioSpaceMethods (v0.2.0) [5] with the <code>calculatePhysioMap</code> function. For each sample, the ranked log<sub>2</sub> fold-change vector (treatment vs. reference) was projected onto each stress space to produce a PhysioScore per axis, quantifying the similarity between the sample's transcriptional profile and each reference stress response.</p>
+<p><strong>Input preparation:</strong> Log<sub>2</sub> fold changes were computed per sample as the difference between each sample's normalized expression and the group mean of ground-control samples under the same light condition. Only genes with one-to-one <em>Arabidopsis</em> orthologs were used.</p>
+<p><strong>Projection parameters:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Value</th>
+<th>Rationale</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Space</td>
+<td>AT_Stress_Space, AT_Stress_Meta, AT_RNAseq</td>
+<td>Multi-resolution stress characterization</td>
+</tr>
+<tr>
+<td>Gene selection</td>
+<td>One-to-one orthologs only</td>
+<td>Unambiguous cross-species mapping</td>
+</tr>
+<tr>
+<td>Ranking method</td>
+<td>Default (PhysioSpaceMethods)</td>
+<td>Rank-based projection is robust to scale differences</td>
+</tr>
+</tbody>
+<h3>Group-level contrasts</h3>
+<p>From the per-sample PhysioScore matrices, group means were computed for each of the four experimental groups (Flight_Red, Flight_Blue, Ground_Red, Ground_Blue). Three contrast types were derived:</p>
+<ol>
+<li><strong>Flight effect</strong> (per light condition): Flight group mean − Ground group mean under the same light condition. Positive values indicate stress-axis activation by spaceflight.</li>
+<li><strong>Light effect</strong> (per condition): Blue group mean − Red group mean under the same condition. Positive values indicate stress-axis activation by blue light.</li>
+<li><strong>Interaction</strong>: (Flight_Blue − Flight_Red) − (Ground_Blue − Ground_Red). Non-zero values indicate that the light modulation of the spaceflight response differs between flight and ground conditions.</li>
+</ol>
+<h3>Cell-type PhysioScores</h3>
+<p>Cell-type-specific PhysioScores were computed by projecting the mean log<sub>2</sub> fold-change profile of each cell-type marker gene set onto the three stress spaces. Four cell types were analyzed: leaf Epidermis, leaf Mesophyll, root Cortex (ACT2), and root Exodermis. Marker gene sets were derived from published single-cell atlases [8, 9] as described in Section S4.</p>
+<h3>Significance assessment</h3>
+<p>PhysioScores are bounded similarity metrics (range approximately −100 to +100) rather than statistical test statistics. Following the PhysioSpace convention [5, 6], axes with |PhysioScore| ≥ 10 are considered biologically meaningful, and axes with |PhysioScore| ≥ 25 are considered strong signals. Interaction terms with |PhysioScore| ≥ 15 are considered notable, as interaction effects are inherently smaller than main effects.</p>
+
+<h2>S6. Software Versions</h2>
+<table>
+<thead>
+<tr>
+<th>Software</th>
+<th>Version</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>R</td>
+<td>4.4.2</td>
+<td>Statistical computing environment</td>
+</tr>
+<tr>
+<td>DESeq2</td>
+<td>1.38.3</td>
+<td>Differential expression analysis</td>
+</tr>
+<tr>
+<td>ashr</td>
+<td>2.2-63</td>
+<td>Adaptive LFC shrinkage</td>
+</tr>
+<tr>
+<td>clusterProfiler</td>
+<td>4.10.0</td>
+<td>Functional enrichment analysis</td>
+</tr>
+<tr>
+<td>biomaRt</td>
+<td>2.58.2</td>
+<td>Gene ID mapping (Ensembl)</td>
+</tr>
+<tr>
+<td>Ensembl Plants</td>
+<td>Release 109</td>
+<td>Reference genome annotations</td>
+</tr>
+<tr>
+<td>ITAG</td>
+<td>4.0</td>
+<td>S. lycopersicum genome annotation</td>
+</tr>
+<tr>
+<td>KEGG</td>
+<td>sly (tomato)</td>
+<td>Pathway database</td>
+</tr>
+<tr>
+<td>Python</td>
+<td>3.11</td>
+<td>Visualization and data processing</td>
+</tr>
+<tr>
+<td>matplotlib</td>
+<td>3.8</td>
+<td>Publication-quality figure generation</td>
+</tr>
+<tr>
+<td>seaborn</td>
+<td>0.13</td>
+<td>Statistical data visualization</td>
+</tr>
+<tr>
+<td>scipy</td>
+<td>1.11</td>
+<td>Statistical tests (Pearson correlation)</td>
+</tr>
+<tr>
+<td>numpy</td>
+<td>1.24</td>
+<td>Numerical computing</td>
+</tr>
+<tr>
+<td>pandas</td>
+<td>2.0</td>
+<td>Data manipulation</td>
+</tr>
+<tr>
+<td>weasyprint</td>
+<td>69.0</td>
+<td>HTML to PDF conversion</td>
+</tr>
+<tr>
+<td>PhysioSpaceMethods</td>
+<td>0.2.0</td>
+<td>PhysioSpace stress-pattern projection</td>
+</tr>
+<tr>
+<td>biomaRt</td>
+<td>2.58.2</td>
+<td>Ensembl ortholog mapping (also used in S1)</td>
+</tr>
+</tbody>
+</table>
+<h2>References</h2>
+<ol>
+<li>Love MI, Huber W, Anders S. Moderated estimation of fold change and dispersion for RNA-seq data with DESeq2. Genome Biol. 2014;15(12):550.</li>
+<li>Stephens M. False discovery rates: a new deal. Biostatistics. 2017;18(2):275-294.</li>
+<li>VanderWeele TJ. Interaction analyses in epidemiology. Ann Epidemiol. 2019;29:56-61.</li>
+<li>Yu G, Wang LG, Han Y, He QY. clusterProfiler: an R package for comparing biological themes among gene clusters. OMICS. 2012;16(5):284-287.</li>
+<li>Yue J, et al. A single-cell resolution atlas of the tomato leaf. Plant Cell Environ. 2024;47(7):2660-2674.</li>
+<li>Kajala K, et al. Translational profiling of purified cell types from the tomato root. Plant Cell. 2021;33(10):3130-3148.</li>
+<li>Herrero J, et al. Ensembl comparative genomics resources. Database. 2016;2016:bav053.</li>
+<li>Lenz M, et al. PhysioSpace: a physiological space for integrative analysis of gene expression data. Bioinformatics. 2013;29(16):2054-2060.</li>
+<li>Hadizadeh Esfahani A, et al. Plant PhysioSpace: a cross-species reference framework for meta-analysis of plant stress experiments. Plant Physiol. 2021;187(2):734-749.</li>
+</ol>
+</body>
+</html>
