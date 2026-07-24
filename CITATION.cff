@@ -1,0 +1,42 @@
+cff-version: 1.2.0
+message: "If you use this analysis, please cite it as below."
+title: "PhysioSpace stress decoding of spaceflight tomato (VEG-05 / OSD-767): Light x Condition interaction and cell-type asymmetry"
+abstract: >-
+  Light x Condition (2x2 factorial) re-analysis of the NASA VEG-05 experiment
+  (OSD-767 / GLDS-709), in which dwarf tomato (Solanum lycopersicum cv. 'Red
+  Robin') was grown aboard the ISS under red- or blue-rich LED light versus
+  ground controls. Includes DESeq2 interaction modelling of leaf and adventitious
+  root, GO/KEGG enrichment, cell-type deconvolution (radial root asymmetry), and
+  PhysioSpace stress-pattern decoding onto Arabidopsis stress compendia, plus the
+  npj Microgravity manuscript, supplementary data and figures.
+type: dataset
+authors:
+  - family-names: Barker
+    given-names: Richard
+    alias: dr-richard-barker
+keywords:
+  - spaceflight
+  - microgravity
+  - tomato
+  - Solanum lycopersicum
+  - VEG-05
+  - RNA-seq
+  - DESeq2
+  - light x condition interaction
+  - PhysioSpace
+  - stress decoding
+  - cell-type asymmetry
+  - GeneLab
+  - OSDR
+license: CC0-1.0
+repository-code: "https://github.com/dr-richard-barker/PhysioSpace_stress_decoding_VEG05"
+references:
+  - type: software
+    title: "PhysioSpaceMethods: physiological-space projection of transcriptomes"
+    authors:
+      - family-names: Lenz
+        given-names: Michael
+    notes: "Lenz et al. PhysioSpace, PLoS ONE 2013; Plant PhysioSpace: Hadizadeh Esfahani et al., Plant Physiol 2021."
+  - type: data
+    title: "OSD-767 / GLDS-709 (VEG-05), NASA Open Science Data Repository"
+    url: "https://osdr.nasa.gov/bio/repo/data/studies/OSD-767"
