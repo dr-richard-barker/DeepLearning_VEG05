@@ -179,7 +179,7 @@ The authors thank the NASA GeneLab team for making the OSD-767 RNA-seq data publ
 
 ## Data availability
 
-RNA-seq data are available from NASA GeneLab (OSD-767). Processed results and Supplementary Data files 1–13 are provided with this manuscript (Supplementary Data 1–6: DESeq2 results; Supplementary Data 7: GO enrichment; Supplementary Data 8: KEGG enrichment; Supplementary Data 9: per-cell-type KEGG enrichment; Supplementary Data 10: leaf cluster annotations; Supplementary Data 11: PhysioScore matrices; Supplementary Data 12: PhysioSpace group means and interactions; Supplementary Data 13: cell-type PhysioScores; Supplementary Data 14: additive main-effect DEGs). Supplementary Note 1 reports a companion additive-model (light-averaged) analysis of the main effect of spaceflight.
+RNA-seq data are available from NASA GeneLab (OSD-767). Processed results and Supplementary Data files 1–14 are provided with this manuscript (Supplementary Data 1–6: DESeq2 results; Supplementary Data 7: GO enrichment; Supplementary Data 8: KEGG enrichment; Supplementary Data 9: per-cell-type KEGG enrichment; Supplementary Data 10: leaf cluster annotations; Supplementary Data 11: PhysioScore matrices; Supplementary Data 12: PhysioSpace group means and interactions; Supplementary Data 13: cell-type PhysioScores; Supplementary Data 14: additive main-effect DEGs). Supplementary Note 1 reports a companion additive-model (light-averaged) analysis of the main effect of spaceflight.
 
 ## Code availability
 
