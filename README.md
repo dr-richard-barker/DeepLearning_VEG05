@@ -26,17 +26,22 @@ compendia to identify which established stress programs the response resembles �
 
 ---
 
-## Relationship to the companion "main-effects" analysis
+## Main-effects analysis (folded in as Supplementary Note 1)
 
-This is one of a linked series of analyses of the same OSD-767 dataset. A companion
-repository, [`VEGGIE_Tom_Red_Blue_Leaves_and_adv_roots`](https://github.com/dr-richard-barker/VEGGIE_Tom_Red_Blue_Leaves_and_adv_roots),
-reports the **main effect of spaceflight** using an *additive* DESeq2 model
-(`~ light + condition`, light as a covariate), yielding the pooled Flight-vs-Ground
-response (2,132 leaf / 2,582 root DEGs). The present repository instead treats the
-**Light × Condition interaction as the primary question** and layers PhysioSpace
-decoding and cell-type asymmetry on top. The two share the same upstream pipeline,
-scRNA cell-type markers (`scDATA/`), and enrichment framework, but answer different
-questions and report different DEG counts by design (see each manuscript's Methods).
+The **additive main-effect** view of this dataset — DESeq2 `~ light + condition`
+(light as covariate), estimating the light-averaged Flight-vs-Ground response
+(2,132 leaf / 2,582 root DEGs, dominated by oxidative-stress and phenylpropanoid
+metabolism) — is included here as **Supplementary Note 1**
+(`supplementary/supplementary_note_1_main_effects.{md,html}`), with Supplementary
+Figs. 20–21 and Supplementary Data 14. It provides the "core microgravity footprint"
+against which this paper's Light × Condition interaction and PhysioSpace decoding are
+interpreted; the interaction-model condition term (527 leaf / 704 root) and the
+additive main effect are different estimands, not conflicting results.
+
+The full analysis archive for that main-effects work (raw DESeq2 objects, all figures)
+lives in the companion repository
+[`VEGGIE_Tom_Red_Blue_Leaves_and_adv_roots`](https://github.com/dr-richard-barker/VEGGIE_Tom_Red_Blue_Leaves_and_adv_roots),
+which shares the same upstream pipeline and scRNA markers (`scDATA/`).
 
 ---
 
@@ -77,9 +82,11 @@ questions and report different DEG counts by design (see each manuscript's Metho
 10. Flight × Light interaction on stress patterns (root Biotic.Hormone = −44.2)
 11. Cell-type PhysioScore profiles
 
-19 supplementary figures and 13 Supplementary Data tables are listed in the
-manuscript (`manuscript/osd767_manuscript.md`, Figure/Table Legends) and provided in
-`figures_supplementary/` and `supplementary_tables/`.
+21 supplementary figures (19 in the main package + Figs. 20–21 for the folded-in
+main-effects analysis) and 14 Supplementary Data tables are listed in the manuscript
+(`manuscript/osd767_manuscript.md`, Figure/Table Legends) and provided in
+`figures_supplementary/` and `supplementary_tables/`. Supplementary Note 1
+(`supplementary/`) presents the additive main-effects analysis.
 
 ---
 
