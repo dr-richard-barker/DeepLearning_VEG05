@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Home · PhysioSpace VEG-05</title>
+<meta name="description" content="Light quality modulates spaceflight stress decoding with cell-type asymmetry in tomato — a 2×2 Light×Condition analysis of ISS OSD-767 with PhysioSpace stress-pattern decoding. FAIR data and code.">
+<link rel="stylesheet" href="assets/style.css">
+</head><body>
+<header class="site"><nav>
+  <span class="brand">🍅 PhysioSpace VEG-05</span>
+  <a href="#abstract" style="color:var(--accent)">Abstract</a>
+  <a href="#highlights">Highlights</a>
+  <a href="#figures">Figures</a>
+  <a href="#data">Data &amp; code</a>
+  <a href="https://github.com/dr-richard-barker/PhysioSpace_stress_decoding_VEG05">GitHub ↗</a>
+</nav></header>
+<main>
+<section class="hero">
+  <h1>Light quality modulates spaceflight stress decoding, with cell-type asymmetry in tomato</h1>
+  <p class="lede">A 2 × 2 (Light × Condition) analysis of ISS tomato RNA-seq (OSD-767) across leaf and
+     root tissues, quantifying how red vs blue LED light interacts with spaceflight — resolved to
+     cell types and decoded with PhysioSpace stress patterns.</p>
+  <div class="badges">
+    <span class="badge">MIT licensed</span><span class="badge">FAIR</span>
+    <span class="badge">NASA OSDR · OSD-767</span><span class="badge">2×2 factorial</span>
+    <span class="badge">PhysioSpace</span><span class="badge">cell-type resolved</span>
+  </div>
+  <div class="btnrow">
+    <a class="btn primary" href="https://github.com/dr-richard-barker/PhysioSpace_stress_decoding_VEG05/blob/main/manuscript/osd767_manuscript.md">Read the manuscript →</a>
+    <a class="btn" href="#figures">Figures</a>
+    <a class="btn" href="https://github.com/dr-richard-barker/PhysioSpace_stress_decoding_VEG05/tree/main/analysis">Analysis code</a>
+    <a class="btn" href="https://github.com/dr-richard-barker/PhysioSpace_stress_decoding_VEG05">Code &amp; data (GitHub)</a>
+  </div>
+  <p class="lede"><b>Headline:</b> light quality and spaceflight interact through <b>compensatory
+  rather than additive</b> dynamics (leaf interaction r = −0.84); the spaceflight response is a
+  tissue-specific mosaic — <b>light-stress suppression in leaves, biotic/hormone defense priming
+  in roots</b> — with strong radial cell-type asymmetry.</p>
+</section>
+
+<h2 id="abstract">Abstract</h2>
+<div class="content"><p>Spaceflight profoundly alters plant gene expression, but how growth
+conditions modulate this response remains poorly understood. We analyzed RNA-seq from tomato
+grown aboard the ISS under red or blue LED illumination using a <b>2 × 2 factorial design (Light ×
+Condition)</b> across leaf and root tissues. Light quality dominated the leaf transcriptome
+(<b>2,314 light DEGs vs. 527 condition DEGs</b>), whereas spaceflight dominated the root response
+(<b>704 condition DEGs vs. 256 light DEGs</b>). The Light × Condition interaction comprised 5,042
+leaf genes (25% of the expressed transcriptome), with a strong negative correlation between light
+and interaction log-fold-changes (<b>r = −0.84</b>), consistent with compensatory dynamics:
+pathways pre-activated by one light condition show attenuated spaceflight responses. Cell-type
+resolution revealed <b>radial asymmetry in root</b>, with outer layers (Cortex_ACT2: 8.3:1 up/down;
+OR = 26.9) showing opposite enrichment to inner layers. PhysioSpace stress-pattern decoding showed
+spaceflight <b>suppresses light-related stress programs in leaves</b> (Light flight effect −27.2 to
+−32.2) while <b>activating biotic/hormone defense programs in roots</b> (+14.2 under red LED, +58.4
+under blue LED) — the root biotic/hormone response showing the strongest light-quality interaction
+of any stress axis. Cell-type mapping confirmed the asymmetry, with root exodermis showing the
+strongest hormone activation and leaf mesophyll the strongest light-stress response. These
+findings have implications for ISS growth-chamber light design and for understanding how
+environmental context shapes spaceflight biology.</p><hr /></div>
+
+<h2 id="highlights">Highlights</h2>
+<div class="cards">
+  <div class="card"><h3>Light vs spaceflight, by organ</h3>
+    <p>Light dominates the leaf (<span class="k">2,314</span> vs 527 DEGs); spaceflight dominates the root (<span class="k">704</span> vs 256).</p></div>
+  <div class="card"><h3>Compensatory interaction</h3>
+    <p>5,042 leaf interaction genes (25% of the transcriptome); light vs interaction LFCs anti-correlate (<span class="k">r = −0.84</span>).</p></div>
+  <div class="card"><h3>Radial cell-type asymmetry</h3>
+    <p>Outer root layers respond opposite to inner (Cortex_ACT2 <span class="k">OR = 26.9</span>); exodermis shows the strongest hormone activation.</p></div>
+  <div class="card"><h3>PhysioSpace decoding</h3>
+    <p>Spaceflight suppresses leaf light-stress programs and primes root biotic/hormone defense (<span class="k">+58.4</span> under blue LED).</p></div>
+</div>
+
+<h2 id="figures">Selected figures</h2>
+<div class="gallery">
+  <figure><a href="https://github.com/dr-richard-barker/PhysioSpace_stress_decoding_VEG05/tree/main/figures_main"><img src="assets/figures/fig1_study_design_overview.png" alt="2x2 study design overview: light x condition across leaf and root."></a><figcaption>Fig 1 — Study design: a 2 × 2 Light × Condition factorial across leaf and root.</figcaption></figure>
+  <figure><a href="https://github.com/dr-richard-barker/PhysioSpace_stress_decoding_VEG05/tree/main/figures_main"><img src="assets/figures/fig2_interaction_scatters.png" alt="Light vs interaction log-fold-change scatter showing compensatory dynamics."></a><figcaption>Fig 2 — Light × Condition interaction: compensatory anti-correlation (r = −0.84).</figcaption></figure>
+  <figure><a href="https://github.com/dr-richard-barker/PhysioSpace_stress_decoding_VEG05/tree/main/figures_main"><img src="assets/figures/fig11_physio_celltype.png" alt="Cell-type PhysioSpace mapping showing radial asymmetry."></a><figcaption>Fig 11 — Cell-type PhysioSpace mapping: radial asymmetry (exodermis hormone activation; mesophyll light-stress).</figcaption></figure>
+</div>
+
+<h2 id="data">Data &amp; code</h2>
+<div class="content"><ul>
+  <li><b>Manuscript:</b> <a href="https://github.com/dr-richard-barker/PhysioSpace_stress_decoding_VEG05/blob/main/manuscript/osd767_manuscript.md"><code>manuscript/osd767_manuscript.md</code></a></li>
+  <li><b>Analysis code:</b> <a href="https://github.com/dr-richard-barker/PhysioSpace_stress_decoding_VEG05/tree/main/analysis"><code>analysis/</code></a> (DE, interaction, cell-type deconvolution, PhysioSpace decoding)</li>
+  <li><b>Results &amp; tables:</b> <a href="https://github.com/dr-richard-barker/PhysioSpace_stress_decoding_VEG05/tree/main/supplementary_tables"><code>supplementary_tables/</code></a>, <a href="https://github.com/dr-richard-barker/PhysioSpace_stress_decoding_VEG05/tree/main/extra_results"><code>extra_results/</code></a></li>
+  <li><b>Figures:</b> <a href="https://github.com/dr-richard-barker/PhysioSpace_stress_decoding_VEG05/tree/main/figures_main"><code>figures_main/</code></a> and <a href="https://github.com/dr-richard-barker/PhysioSpace_stress_decoding_VEG05/tree/main/figures_supplementary"><code>figures_supplementary/</code></a></li>
+</ul>
+<p class="note">Sequencing data from NASA OSDR (OSD-767); cite the accession. OSDR data remain
+subject to the NASA Open Data policy. Sibling analysis to the
+<a href="https://dr-richard-barker.github.io/veg05-integrated-omics/">VEG-05 host×microbiome integration</a>.</p></div>
+</main>
+<footer class="site">
+  PhysioSpace VEG-05 — light × spaceflight stress decoding with cell-type asymmetry in tomato ·
+  FAIR data &amp; code ·
+  <a href="https://github.com/dr-richard-barker/PhysioSpace_stress_decoding_VEG05">GitHub</a>
+</footer></body></html>
